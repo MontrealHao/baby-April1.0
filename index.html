@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宝宝成长记录</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .title {
+            text-align: center;
+            color: #FF9F9F;
+            margin-bottom: 30px;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .clock {
+            text-align: center;
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 18px;
+            font-family: monospace;
+        }
+
+        .main-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .circle-button {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .circle-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .function-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .function-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            background-color: #f0f0f0;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+            font-size: 14px;
+            min-width: 100px;
+        }
+        .function-button:hover {
+            background-color: #e0e0e0;
+            transform: translateY(-2px);
+        }
+        .function-button:active {
+            transform: translateY(0);
+        }
+
+        .button-1 { background-color: #FF6B6B; }
+        .button-2 { background-color: #4ECDC4; }
+        .button-3 { background-color: #45B7D1; }
+        .button-4 { background-color: #96CEB4; }
+        .button-5 { background-color: #FFEEAD; color: #333; }
+
+        .records {
+            background-color: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .records h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .record-item {
+            padding: 12px;
+            margin: 8px 0;
+            background-color: #f8f8f8;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #333;
+            transition: background-color 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .record-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .record-content {
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .delete-button {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .delete-button:hover {
+            background-color: #cc0000;
+        }
+
+        .today-statistics {
+            display: none;
+            background-color: #e8f5e9;
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .statistics {
+            display: none;
+            background-color: #fff3e0;
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .stat-item {
+            margin: 10px 0;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .time-list {
+            font-size: 13px;
+            color: #666;
+            margin-left: 15px;
+            margin-top: 5px;
+        }
+
+        .history-date {
+            cursor: pointer;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .history-date:hover {
+            background-color: #e9ecef;
+        }
+
+        .history-details {
+            display: none;
+            padding: 10px;
+            margin-left: 20px;
+            border-left: 2px solid #dee2e6;
+        }
+
+        /* 时间编辑模态框样式 */
+        .time-edit-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 2000;
+            width: 90%;
+            max-width: 300px;
+        }
+
+        .time-picker {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .time-edit-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .time-edit-buttons button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .confirm-edit {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .cancel-edit {
+            background-color: #f0f0f0;
+            color: #666;
+        }
+
+        .function-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="clock" id="clock"></div>
+        <h1 class="title">宝宝茁壮成长吖~</h1>
+        
+        <div class="main-buttons">
+            <button class="circle-button button-1" onclick="showFeedingOptions()">吃饭了</button>
+            <button class="circle-button button-2" onclick="showSleepOptions()">睡觉了</button>
+            <button class="circle-button button-3" onclick="recordAction('嘘嘘了')">嘘嘘了</button>
+            <button class="circle-button button-4" onclick="recordAction('拉粑粑了')">拉粑粑了</button>
+            <button class="circle-button button-5" onclick="recordAction('吃维生素D了')">吃维生素D了</button>
+        </div>
+
+        <!-- 吃饭选项 -->
+        <div id="feedingOptions" class="function-buttons" style="display: none;">
+            <button class="function-button" style="background-color: #FF9F9F;" onclick="recordAction('母乳'); hideFeedingOptions()">母乳</button>
+            <button class="function-button" style="background-color: #4ECDC4;" onclick="showFormulaOptions()">奶粉</button>
+        </div>
+
+        <!-- 奶粉选项 -->
+        <div id="formulaOptions" class="function-buttons" style="display: none;">
+            <input type="number" id="formulaAmount" class="time-picker" placeholder="输入奶粉量(cc)" min="1" style="width: 200px;">
+            <button class="function-button" style="background-color: #4ECDC4;" onclick="submitFormula()">确认</button>
+            <button class="function-button" style="background-color: #808080;" onclick="hideFormulaOptions()">取消</button>
+        </div>
+
+        <!-- 睡觉选项 -->
+        <div id="sleepOptions" class="function-buttons" style="display: none;">
+            <button class="function-button" style="background-color: #45B7D1;" onclick="startSleep(); hideSleepOptions()">睡了</button>
+            <button class="function-button" style="background-color: #96CEB4;" onclick="endSleep(); hideSleepOptions()">醒了</button>
+        </div>
+
+        <div class="function-buttons">
+            <div class="function-row">
+                <button class="function-button" style="background-color: #FF9F9F;" onclick="finishDay()">收工</button>
+                <button class="function-button" style="background-color: #3498DB;" onclick="showHistory()">历史记录</button>
+                <button class="function-button" style="background-color: #808080;" onclick="clearRecords()">清空</button>
+            </div>
+            <div class="function-row">
+                <button class="function-button" style="background-color: #e74c3c;" onclick="resetToFactory()">恢复出厂设置</button>
+                <button class="function-button" style="background-color: #2ecc71;" onclick="exportHistory()">导出历史</button>
+                <button class="function-button" style="background-color: #3498db;" onclick="document.getElementById('importFile').click()">导入历史</button>
+                <input type="file" id="importFile" accept=".txt" style="display: none" onchange="importHistory(event)">
+            </div>
+        </div>
+
+        <div class="records">
+            <h3>今日记录</h3>
+            <div id="recordsList"></div>
+        </div>
+
+        <!-- 今日统计区域 -->
+        <div id="todayStatistics" class="today-statistics">
+            <h3>今日统计</h3>
+            <div id="todayStatsList"></div>
+        </div>
+
+        <div id="statistics" class="statistics">
+            <h3>历史记录</h3>
+            <div id="historyList"></div>
+        </div>
+    </div>
+
+    <!-- 时间编辑模态框 -->
+    <div id="timeEditModal" class="time-edit-modal">
+        <h3>编辑时间</h3>
+        <input type="datetime-local" id="timeEditInput" class="time-picker">
+        <div class="time-edit-buttons">
+            <button class="cancel-edit" onclick="cancelTimeEdit()">取消</button>
+            <button class="confirm-edit" onclick="confirmTimeEdit()">确认</button>
+        </div>
+    </div>
+
+    <script>
+        let records = [];
+        let currentEditingIndex = -1;
+        let sleepStartTime = null;
+        let autoFinishTimer = null; // 添加全局定时器变量
+
+        // 加载保存的记录
+        window.onload = function() {
+            const savedRecords = localStorage.getItem('records');
+            if (savedRecords) {
+                records = JSON.parse(savedRecords);
+                refreshRecordsList();
+            }
+            
+            // 显示保存的历史记录
+            showHistory();
+
+            // 检查是否需要自动处理
+            checkAndHandleAutoFinish();
+
+            // 启动时钟
+            updateClock();
+            setInterval(updateClock, 1000);
+        };
+
+        // 更新时钟显示
+        function updateClock() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const date = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            document.getElementById('clock').innerHTML = 
+                `${year}年${month}月${date}日 ${hours}:${minutes}:${seconds}`;
+        }
+
+        // 显示吃饭选项
+        function showFeedingOptions() {
+            document.getElementById('feedingOptions').style.display = 'flex';
+            document.getElementById('sleepOptions').style.display = 'none';
+        }
+
+        // 隐藏吃饭选项
+        function hideFeedingOptions() {
+            document.getElementById('feedingOptions').style.display = 'none';
+        }
+
+        // 显示睡觉选项
+        function showSleepOptions() {
+            document.getElementById('sleepOptions').style.display = 'flex';
+            document.getElementById('feedingOptions').style.display = 'none';
+        }
+
+        // 隐藏睡觉选项
+        function hideSleepOptions() {
+            document.getElementById('sleepOptions').style.display = 'none';
+        }
+
+        // 显示奶粉选项
+        function showFormulaOptions() {
+            document.getElementById('formulaOptions').style.display = 'flex';
+            document.getElementById('feedingOptions').style.display = 'none';
+        }
+
+        // 隐藏奶粉选项
+        function hideFormulaOptions() {
+            document.getElementById('formulaOptions').style.display = 'none';
+        }
+
+        // 记录操作
+        function recordAction(action) {
+            if (confirm(`确认记录：${action}？`)) {
+                const now = new Date();
+                records.push({
+                    time: now.toISOString(),
+                    action: action
+                });
+                saveRecords();
+                refreshRecordsList();
+            }
+        }
+
+        // 记录奶粉量
+        function submitFormula() {
+            const amount = document.getElementById('formulaAmount').value;
+            if (amount && amount > 0) {
+                if (confirm(`确认记录：奶粉${amount}cc？`)) {
+                    recordFormula(parseInt(amount));
+                    document.getElementById('formulaAmount').value = '';
+                    hideFormulaOptions();
+                }
+            } else {
+                alert('请输入有效的奶粉量！');
+            }
+        }
+
+        // 记录奶粉量
+        function recordFormula(amount) {
+            recordAction(`奶粉${amount}cc`);
+        }
+
+        // 开始睡眠
+        function startSleep() {
+            if (confirm('确认记录：宝宝睡了？')) {
+                sleepStartTime = new Date();
+                recordAction('睡了');
+            }
+        }
+
+        // 结束睡眠
+        function endSleep() {
+            if (confirm('确认记录：宝宝醒了？')) {
+                const endTime = new Date();
+                // 查找最近的"睡了"记录
+                const lastSleepRecord = [...records].reverse().find(r => r.action === '睡了');
+                if (lastSleepRecord) {
+                    const startTime = new Date(lastSleepRecord.time);
+                    const duration = Math.round((endTime - startTime) / (1000 * 60)); // 转换为分钟
+                    recordAction(`醒了（睡了${duration}分钟）`);
+                } else {
+                    recordAction('醒了');
+                }
+                sleepStartTime = null;
+            }
+        }
+
+        // 格式化日期时间
+        function formatDateTime(dateTimeStr) {
+            const date = new Date(dateTimeStr);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}`;
+        }
+
+        // 刷新记录列表
+        function refreshRecordsList() {
+            const recordsList = document.getElementById('recordsList');
+            // 按时间倒序排序
+            const sortedRecords = [...records].sort((a, b) => new Date(b.time) - new Date(a.time));
+            recordsList.innerHTML = sortedRecords.map((record, index) => `
+                <div class="record-item">
+                    <div class="record-content" onclick="editTime(${records.indexOf(record)})">
+                        ${formatDateTime(record.time)} - ${record.action}
+                    </div>
+                    <button class="delete-button" onclick="deleteRecord(${records.indexOf(record)})">删除</button>
+                </div>
+            `).join('');
+        }
+
+        // 保存记录到localStorage
+        function saveRecords() {
+            localStorage.setItem('records', JSON.stringify(records));
+        }
+
+        // 编辑时间
+        function editTime(index) {
+            currentEditingIndex = index;
+            const record = records[index];
+            const timeEditInput = document.getElementById('timeEditInput');
+            timeEditInput.value = record.time.slice(0, 16); // 格式化为datetime-local输入格式
+            document.getElementById('timeEditModal').style.display = 'block';
+        }
+
+        // 确认时间编辑
+        function confirmTimeEdit() {
+            const newTime = document.getElementById('timeEditInput').value;
+            if (currentEditingIndex >= 0 && newTime) {
+                const currentRecord = records[currentEditingIndex];
+                const newDate = new Date(newTime);
+                currentRecord.time = newDate.toISOString();
+
+                // 如果编辑的是"醒了"记录，更新睡眠时长
+                if (currentRecord.action.includes('醒了')) {
+                    // 查找最近的"睡了"记录
+                    const prevRecords = records.slice(0, currentEditingIndex);
+                    const lastSleepRecord = [...prevRecords].reverse().find(r => r.action === '睡了');
+                    if (lastSleepRecord) {
+                        const startTime = new Date(lastSleepRecord.time);
+                        const duration = Math.round((newDate - startTime) / (1000 * 60));
+                        currentRecord.action = `醒了（睡了${duration}分钟）`;
+                    }
+                }
+
+                records.sort((a, b) => new Date(a.time) - new Date(b.time));
+                saveRecords();
+                refreshRecordsList();
+                cancelTimeEdit();
+            }
+        }
+
+        // 取消时间编辑
+        function cancelTimeEdit() {
+            document.getElementById('timeEditModal').style.display = 'none';
+            currentEditingIndex = -1;
+        }
+
+        // 清空记录
+        function clearRecords() {
+            if (confirm('确定要清空今日记录吗？此操作不可撤销！')) {
+                records = [];
+                saveRecords();
+                refreshRecordsList();
+                document.getElementById('todayStatistics').style.display = 'none';
+            }
+        }
+
+        // 恢复出厂设置
+        function resetToFactory() {
+            if (confirm('确定要恢复出厂设置吗？这将清除所有历史记录！')) {
+                if (confirm('最后确认一次，此操作不可撤销！')) {
+                    localStorage.removeItem('historyRecords');
+                    alert('历史记录已清除！');
+                    location.reload();
+                }
+            }
+        }
+
+        // 显示今日统计
+        function showTodayStatistics() {
+            const todayStats = document.getElementById('todayStatistics');
+            const todayStatsList = document.getElementById('todayStatsList');
+            
+            // 获取当前日期
+            const now = new Date();
+            const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            
+            // 获取历史记录
+            const historyRecords = JSON.parse(localStorage.getItem('historyRecords') || '[]');
+            
+            // 查找今天的记录
+            const todayRecord = historyRecords.find(r => r.date === today);
+            
+            if (todayRecord) {
+                // 使用历史记录中的统计数据
+                const stats = todayRecord.summary;
+                
+                // 计算睡眠时长
+                const totalSleepMinutes = stats.sleep.reduce((sum, period) => sum + period.duration, 0);
+                const sleepHours = Math.floor(totalSleepMinutes / 60);
+                const sleepMinutes = totalSleepMinutes % 60;
+
+                // 生成统计HTML
+                let statsHtml = '';
+                
+                if (stats.motherMilk > 0) {
+                    statsHtml += `<div class="stat-item">
+                        <p>母乳：${stats.motherMilk}次</p>
+                    </div>`;
+                }
+                
+                if (stats.formulaMilk.count > 0) {
+                    statsHtml += `<div class="stat-item">
+                        <p>奶粉：${stats.formulaMilk.count}次（总量${stats.formulaMilk.total}cc）</p>
+                    </div>`;
+                }
+                
+                if (stats.pee > 0) {
+                    statsHtml += `<div class="stat-item">
+                        <p>嘘嘘：${stats.pee}次</p>
+                    </div>`;
+                }
+                
+                if (stats.poop > 0) {
+                    statsHtml += `<div class="stat-item">
+                        <p>拉粑粑：${stats.poop}次</p>
+                    </div>`;
+                }
+                
+                if (stats.vitaminD > 0) {
+                    statsHtml += `<div class="stat-item">
+                        <p>维生素D：${stats.vitaminD}次</p>
+                    </div>`;
+                }
+                
+                if (stats.sleep.length > 0) {
+                    statsHtml += `<div class="stat-item">
+                        <p>睡眠：${stats.sleep.length}次（总时长${sleepHours}小时${sleepMinutes}分钟）</p>
+                    </div>`;
+                }
+
+                todayStatsList.innerHTML = statsHtml;
+                todayStats.style.display = 'block';
+            } else {
+                // 如果没有今天的记录，显示空统计
+                todayStatsList.innerHTML = '<p>今日暂无记录</p>';
+                todayStats.style.display = 'block';
+            }
+        }
+
+        // 计算睡眠统计
+        function calculateSleepStats(records) {
+            let sleepPeriods = [];
+            let startTime = null;
+
+            for (let record of records) {
+                if (record.action === '睡了') {
+                    startTime = new Date(record.time);
+                } else if (record.action.includes('醒了') && startTime) {
+                    let endTime = new Date(record.time);
+                    let duration = Math.round((endTime - startTime) / (1000 * 60)); // 转换为分钟
+                    sleepPeriods.push({
+                        start: startTime,
+                        end: endTime,
+                        duration: duration
+                    });
+                    startTime = null;
+                }
+            }
+
+            return sleepPeriods;
+        }
+
+        // 收工并保存历史记录
+        function finishDay() {
+            if (confirm('确认收工？这将保存今日记录并清空当前记录。')) {
+                if (records.length === 0) {
+                    alert('今天还没有记录哦！');
+                    return;
+                }
+
+                // 获取当前日期（使用本地时间）
+                const now = new Date();
+                const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                
+                // 检查记录是否都是今天的
+                const hasOtherDayRecords = records.some(record => {
+                    const recordDate = new Date(record.time);
+                    const recordDay = `${recordDate.getFullYear()}-${String(recordDate.getMonth() + 1).padStart(2, '0')}-${String(recordDate.getDate()).padStart(2, '0')}`;
+                    return recordDay !== today;
+                });
+
+                if (hasOtherDayRecords) {
+                    alert('发现非今日记录，请先处理这些记录！');
+                    return;
+                }
+
+                // 计算奶粉总量
+                const formulaRecords = records.filter(r => r.action.startsWith('奶粉'));
+                const totalFormula = formulaRecords.reduce((sum, record) => {
+                    const amount = parseInt(record.action.match(/\d+/)[0]);
+                    return sum + amount;
+                }, 0);
+                
+                // 计算统计数据
+                let stats = {
+                    date: today,
+                    records: records,
+                    summary: {
+                        motherMilk: records.filter(r => r.action === '母乳').length,
+                        formulaMilk: {
+                            count: formulaRecords.length,
+                            total: totalFormula
+                        },
+                        pee: records.filter(r => r.action === '嘘嘘了').length,
+                        poop: records.filter(r => r.action === '拉粑粑了').length,
+                        vitaminD: records.filter(r => r.action === '吃维生素D了').length,
+                        sleep: calculateSleepStats(records)
+                    }
+                };
+
+                // 获取现有历史记录
+                let historyRecords = JSON.parse(localStorage.getItem('historyRecords') || '[]');
+                
+                // 检查是否已存在当天的记录
+                const existingIndex = historyRecords.findIndex(r => r.date === today);
+                if (existingIndex >= 0) {
+                    // 如果存在当天的记录，询问是否合并
+                    if (confirm('今天已经有记录了，是否要合并到现有记录中？')) {
+                        // 合并记录
+                        const existingRecords = historyRecords[existingIndex].records;
+                        const mergedRecords = [...existingRecords, ...records].sort((a, b) => new Date(a.time) - new Date(b.time));
+                        
+                        // 重新计算统计数据
+                        const mergedFormulaRecords = mergedRecords.filter(r => r.action.startsWith('奶粉'));
+                        const mergedTotalFormula = mergedFormulaRecords.reduce((sum, record) => {
+                            const amount = parseInt(record.action.match(/\d+/)[0]);
+                            return sum + amount;
+                        }, 0);
+                        
+                        historyRecords[existingIndex] = {
+                            date: today,
+                            records: mergedRecords,
+                            summary: {
+                                motherMilk: mergedRecords.filter(r => r.action === '母乳').length,
+                                formulaMilk: {
+                                    count: mergedFormulaRecords.length,
+                                    total: mergedTotalFormula
+                                },
+                                pee: mergedRecords.filter(r => r.action === '嘘嘘了').length,
+                                poop: mergedRecords.filter(r => r.action === '拉粑粑了').length,
+                                vitaminD: mergedRecords.filter(r => r.action === '吃维生素D了').length,
+                                sleep: calculateSleepStats(mergedRecords)
+                            }
+                        };
+                    } else {
+                        // 如果不合并，则覆盖现有记录
+                        historyRecords[existingIndex] = stats;
+                    }
+                } else {
+                    historyRecords.push(stats);
+                }
+
+                // 保存历史记录
+                localStorage.setItem('historyRecords', JSON.stringify(historyRecords));
+                
+                // 清空当前记录
+                records = [];
+                saveRecords();
+                refreshRecordsList();
+                
+                // 显示历史记录
+                showHistory();
+                // 显示今日统计
+                showTodayStatistics();
+                alert('今日记录已保存！');
+            }
+        }
+
+        // 显示历史记录
+        function showHistory() {
+            if (confirm('确认查看历史记录？')) {
+                const historyList = document.getElementById('historyList');
+                const statistics = document.getElementById('statistics');
+                const historyRecords = JSON.parse(localStorage.getItem('historyRecords') || '[]');
+
+                if (historyRecords.length === 0) {
+                    historyList.innerHTML = '<p>暂无历史记录</p>';
+                    statistics.style.display = 'block';
+                    return;
+                }
+
+                // 按日期倒序排序，最新的在前
+                historyRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                historyList.innerHTML = historyRecords.map((day, index) => {
+                    // 使用本地时间处理日期
+                    const [year, month, date] = day.date.split('-');
+                    const dateStr = `${year}年${parseInt(month)}月${parseInt(date)}日`;
+                    
+                    // 计算睡眠时间总和
+                    const totalSleepMinutes = day.summary.sleep.reduce((sum, period) => sum + period.duration, 0);
+                    const sleepHours = Math.floor(totalSleepMinutes / 60);
+                    const sleepMinutes = totalSleepMinutes % 60;
+
+                    // 生成当日记录列表（按时间倒序）
+                    const recordsList = day.records
+                        .sort((a, b) => new Date(b.time) - new Date(a.time))
+                        .map(record => {
+                            return `${formatDateTime(record.time)} - ${record.action}`;
+                        }).join('<br>');
+
+                    return `
+                        <div class="stat-item">
+                            <div class="history-date" onclick="toggleHistoryDetails(${index})">
+                                ${dateStr}
+                            </div>
+                            <div class="history-details" id="history-details-${index}">
+                                <div class="stat-item">
+                                    <h4>当日记录</h4>
+                                    <div class="time-list">
+                                        ${recordsList}
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <h4>统计信息</h4>
+                                    <p>母乳：${day.summary.motherMilk}次</p>
+                                    <p>奶粉：${day.summary.formulaMilk.count}次（总量${day.summary.formulaMilk.total}cc）</p>
+                                    <p>嘘嘘：${day.summary.pee}次</p>
+                                    <p>拉粑粑：${day.summary.poop}次</p>
+                                    <p>维生素D：${day.summary.vitaminD}次</p>
+                                    <p>睡眠：${day.summary.sleep.length}次</p>
+                                    <p>睡眠时长：${sleepHours}小时${sleepMinutes}分钟</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                statistics.style.display = 'block';
+            }
+        }
+
+        // 切换历史记录详情显示
+        function toggleHistoryDetails(index) {
+            const details = document.getElementById(`history-details-${index}`);
+            details.style.display = details.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // 删除记录
+        function deleteRecord(index) {
+            if (confirm('确定要删除这条记录吗？')) {
+                records.splice(index, 1);
+                saveRecords();
+                refreshRecordsList();
+            }
+        }
+
+        // 检查并处理自动收工
+        function checkAndHandleAutoFinish() {
+            // 清除可能存在的旧定时器
+            if (autoFinishTimer) {
+                clearTimeout(autoFinishTimer);
+            }
+
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(0, 0, 0, 0);
+            
+            // 计算到下一个午夜的时间
+            const timeUntilMidnight = tomorrow - now;
+            
+            // 设置定时器
+            autoFinishTimer = setTimeout(() => {
+                // 再次检查是否真的到了午夜
+                const currentTime = new Date();
+                if (currentTime.getHours() === 0 && currentTime.getMinutes() === 0) {
+                    // 检查最后一条记录
+                    if (records.length > 0) {
+                        const lastRecord = records[records.length - 1];
+                        if (lastRecord.action === '睡了') {
+                            // 如果最后是睡了，自动记录醒了
+                            const sleepStartTime = new Date(lastRecord.time);
+                            const duration = Math.round((currentTime - sleepStartTime) / (1000 * 60));
+                            records.push({
+                                time: currentTime.toISOString(),
+                                action: `醒了（睡了${duration}分钟）`
+                            });
+                        }
+                    }
+                    
+                    // 执行收工
+                    finishDay();
+                }
+                
+                // 设置下一个检查
+                checkAndHandleAutoFinish();
+            }, timeUntilMidnight);
+        }
+
+        // 页面加载时启动自动收工检查
+        window.onload = function() {
+            const savedRecords = localStorage.getItem('records');
+            if (savedRecords) {
+                records = JSON.parse(savedRecords);
+                refreshRecordsList();
+            }
+            
+            // 显示保存的历史记录
+            showHistory();
+
+            // 检查是否需要自动处理
+            checkAndHandleAutoFinish();
+
+            // 启动时钟
+            updateClock();
+            setInterval(updateClock, 1000);
+        };
+
+        // 页面卸载时清理定时器
+        window.onbeforeunload = function() {
+            if (autoFinishTimer) {
+                clearTimeout(autoFinishTimer);
+            }
+        };
+
+        // 导出历史记录
+        function exportHistory() {
+            if (confirm('确认导出历史记录？')) {
+                const historyRecords = JSON.parse(localStorage.getItem('historyRecords') || '[]');
+                if (historyRecords.length === 0) {
+                    alert('没有可导出的历史记录！');
+                    return;
+                }
+
+                // 创建导出内容
+                let exportContent = '';
+                historyRecords.forEach(day => {
+                    const [year, month, date] = day.date.split('-');
+                    const dateStr = `${year}年${parseInt(month)}月${parseInt(date)}日\n`;
+                    
+                    // 添加记录
+                    exportContent += dateStr + '记录：\n';
+                    day.records.forEach(record => {
+                        const recordTime = new Date(record.time);
+                        const timeStr = `${recordTime.getHours().toString().padStart(2, '0')}:${recordTime.getMinutes().toString().padStart(2, '0')}`;
+                        exportContent += `${timeStr} - ${record.action}\n`;
+                    });
+                    
+                    // 添加统计
+                    exportContent += '\n统计：\n';
+                    exportContent += `母乳：${day.summary.motherMilk}次\n`;
+                    exportContent += `奶粉：${day.summary.formulaMilk.count}次（总量${day.summary.formulaMilk.total}cc）\n`;
+                    exportContent += `嘘嘘：${day.summary.pee}次\n`;
+                    exportContent += `拉粑粑：${day.summary.poop}次\n`;
+                    exportContent += `维生素D：${day.summary.vitaminD}次\n`;
+                    exportContent += `睡眠：${day.summary.sleep.length}次\n`;
+                    
+                    const totalSleepMinutes = day.summary.sleep.reduce((sum, period) => sum + period.duration, 0);
+                    const sleepHours = Math.floor(totalSleepMinutes / 60);
+                    const sleepMinutes = totalSleepMinutes % 60;
+                    exportContent += `睡眠时长：${sleepHours}小时${sleepMinutes}分钟\n`;
+                    
+                    exportContent += '\n----------------------------------------\n\n';
+                });
+
+                // 创建并下载文件
+                const blob = new Blob([exportContent], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `宝宝成长记录_${new Date().toISOString().split('T')[0]}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        // 导入历史记录
+        function importHistory(event) {
+            if (confirm('确认导入历史记录？这将覆盖现有的历史记录！')) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const content = e.target.result;
+                        const days = content.split('\n----------------------------------------\n\n').filter(day => day.trim());
+                        const historyRecords = [];
+
+                        days.forEach(day => {
+                            const lines = day.split('\n').filter(line => line.trim());
+                            const dateLine = lines[0];
+                            const dateMatch = dateLine.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+                            
+                            if (dateMatch) {
+                                const [_, year, month, date] = dateMatch;
+                                const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                                
+                                // 解析记录
+                                const records = [];
+                                let currentSection = '';
+                                let stats = {
+                                    motherMilk: 0,
+                                    formulaMilk: { count: 0, total: 0 },
+                                    pee: 0,
+                                    poop: 0,
+                                    vitaminD: 0,
+                                    sleep: []
+                                };
+
+                                let sleepStartTime = null;
+                                let sleepCount = 0;
+
+                                lines.forEach(line => {
+                                    if (line === '记录：') {
+                                        currentSection = 'records';
+                                    } else if (line === '统计：') {
+                                        currentSection = 'stats';
+                                    } else if (currentSection === 'records' && line.includes(' - ')) {
+                                        const [time, action] = line.split(' - ');
+                                        const [hours, minutes] = time.split(':');
+                                        const recordDate = new Date(year, month - 1, date, hours, minutes);
+                                        
+                                        // 处理睡眠记录
+                                        if (action === '睡了') {
+                                            sleepStartTime = recordDate;
+                                            sleepCount++;
+                                        } else if (action.includes('醒了')) {
+                                            if (sleepStartTime) {
+                                                const duration = Math.round((recordDate - sleepStartTime) / (1000 * 60));
+                                                stats.sleep.push({
+                                                    start: sleepStartTime,
+                                                    end: recordDate,
+                                                    duration: duration
+                                                });
+                                            }
+                                        }
+
+                                        records.push({
+                                            time: recordDate.toISOString(),
+                                            action: action
+                                        });
+                                    } else if (currentSection === 'stats') {
+                                        if (line.startsWith('母乳：')) {
+                                            stats.motherMilk = parseInt(line.match(/\d+/)[0]);
+                                        } else if (line.startsWith('奶粉：')) {
+                                            const matches = line.match(/(\d+)次.*?(\d+)cc/);
+                                            if (matches) {
+                                                stats.formulaMilk.count = parseInt(matches[1]);
+                                                stats.formulaMilk.total = parseInt(matches[2]);
+                                            }
+                                        } else if (line.startsWith('嘘嘘：')) {
+                                            stats.pee = parseInt(line.match(/\d+/)[0]);
+                                        } else if (line.startsWith('拉粑粑：')) {
+                                            stats.poop = parseInt(line.match(/\d+/)[0]);
+                                        } else if (line.startsWith('维生素D：')) {
+                                            stats.vitaminD = parseInt(line.match(/\d+/)[0]);
+                                        } else if (line.startsWith('睡眠：')) {
+                                            stats.sleep.length = parseInt(line.match(/\d+/)[0]);
+                                        }
+                                    }
+                                });
+
+                                // 确保记录按时间排序
+                                records.sort((a, b) => new Date(a.time) - new Date(b.time));
+
+                                historyRecords.push({
+                                    date: dateStr,
+                                    records: records,
+                                    summary: stats
+                                });
+                            }
+                        });
+
+                        // 保存导入的历史记录
+                        localStorage.setItem('historyRecords', JSON.stringify(historyRecords));
+                        alert('历史记录导入成功！');
+                        showHistory();
+                    } catch (error) {
+                        console.error('导入错误：', error);
+                        alert('导入失败，请确保文件格式正确！');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+    </script>
+</body>
+</html> 
